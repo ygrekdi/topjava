@@ -1,17 +1,21 @@
-package ru.javawebinar.topjava.model;
+package ru.javawebinar.topjava.dao;
+
+import ru.javawebinar.topjava.model.Meal;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealCRUDInMemoryImpl implements MealCRUD {
 
-    private static Integer identifier = 0;
-    private static Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
+    private final AtomicInteger identifier = new AtomicInteger();
+    private final Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
 
-    public static synchronized Integer nextId() {
-        return identifier++;
+    @Override
+    public Integer generateId() {
+        return identifier.getAndIncrement();
     }
 
     @Override

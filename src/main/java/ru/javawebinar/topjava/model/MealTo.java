@@ -13,22 +13,22 @@ public class MealTo {
 
     private final Integer id;
 
-    public MealTo(LocalDateTime dateTime, String description, int calories, boolean excess, Integer id) {
+    public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
+        this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excess = excess;
-        this.id = id;
     }
 
     @Override
     public String toString() {
         return "MealTo{" +
-                "dateTime=" + dateTime +
+                "id=" + id +
+                ", dateTime=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
                 ", excess=" + excess +
-                ", id=" + id +
                 '}';
     }
 

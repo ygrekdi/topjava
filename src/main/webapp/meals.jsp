@@ -2,20 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:useBean id="mealServlet" class="ru.javawebinar.topjava.web.MealServlet"/>
+<link rel="stylesheet" href="styles.css"/>
 <html>
-<style>
-    .green {
-        color: green
-    }
-
-    .red {
-        color: red
-    }
-
-    table, th, td {
-        border: 1px solid black;
-    }
-</style>
 <head>
     <title>Meals</title>
 </head>

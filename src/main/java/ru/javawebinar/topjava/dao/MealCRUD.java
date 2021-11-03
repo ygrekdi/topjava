@@ -1,4 +1,6 @@
-package ru.javawebinar.topjava.model;
+package ru.javawebinar.topjava.dao;
+
+import ru.javawebinar.topjava.model.Meal;
 
 import java.util.List;
 
@@ -12,4 +14,6 @@ public interface MealCRUD {
     Meal getById(Integer mealId);
 
     List<Meal> getAll();
+
+    Integer generateId();
 }
