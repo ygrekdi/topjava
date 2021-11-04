@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
@@ -25,19 +22,6 @@ public class MealServlet extends HttpServlet {
     private static final DateTimeFormatter DATE_FORMATTER_INPUT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     private static final int CALORIES_PER_DAY = 2000;
     private static final MealCRUD MEAL_CRUD_IN_MEMORY = new MealCRUDInMemoryImpl();
-
-    static {
-        List<Meal> testMeals = Arrays.asList(
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
-                new Meal(MEAL_CRUD_IN_MEMORY.generateId(), LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-        );
-        testMeals.forEach(MEAL_CRUD_IN_MEMORY::add);
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
