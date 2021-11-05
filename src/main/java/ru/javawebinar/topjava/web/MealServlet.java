@@ -54,8 +54,6 @@ public class MealServlet extends HttpServlet {
         meal.setCalories(Integer.parseInt(req.getParameter("calories")));
         String id = req.getParameter("id");
         if (id == null || id.isEmpty()) {
-            Integer newId = MEAL_CRUD_IN_MEMORY.generateId();
-            meal.setId(newId);
             MEAL_CRUD_IN_MEMORY.add(meal);
         } else {
             meal.setId(Integer.parseInt(id));
@@ -65,5 +63,4 @@ public class MealServlet extends HttpServlet {
         req.setAttribute("mealsList", MealsUtil.filteredByStreams(MEAL_CRUD_IN_MEMORY.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY));
         req.getRequestDispatcher("/meals.jsp").forward(req, resp);
     }
-
 }

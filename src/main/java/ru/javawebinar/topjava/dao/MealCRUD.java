@@ -14,6 +14,4 @@ public interface MealCRUD {
     Meal getById(Integer mealId);
 
     List<Meal> getAll();
-
-    Integer generateId();
 }
