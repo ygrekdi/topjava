@@ -3,9 +3,11 @@ package ru.javawebinar.topjava.repository.inmemory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +31,7 @@ public class InMemoryMealRepository implements MealRepository {
             repository.put(meal.getId(), meal);
             return meal;
         }
-        if (meal.getUserId() != authUserId) {
+        if (meal.getUserId() == null || meal.getUserId() != authUserId) {
             return null;
         }
         // handle case: update, but not present in storage
@@ -39,7 +41,7 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public boolean delete(int id, int authUserId) {
         Meal meal = repository.get(id);
-        if (meal.getUserId() != authUserId) {
+        if (meal == null || meal.getUserId() != authUserId) {
             return false;
         }
         return repository.remove(id) != null;
@@ -48,13 +50,22 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal get(int id, int authUserId) {
         Meal meal = repository.get(id);
-        return meal.getUserId() == authUserId ? meal : null;
+        if (meal == null || meal.getUserId() != authUserId) {
+            return null;
+        }
+        return meal;
     }
 
     @Override
     public Collection<Meal> getAll(int authUserId) {
+        return getAllFiltered(authUserId, null, null);
+    }
+
+    @Override
+    public Collection<Meal> getAllFiltered(int authUserId, LocalDate startDate, LocalDate endDate) {
         return repository.values().stream()
                 .filter(meal -> meal.getUserId().equals(authUserId))
+                .filter(meal -> DateTimeUtil.isBetweenDate(meal.getDate(), startDate, endDate))
                 .sorted((m1, m2) -> -m1.getDateTime().compareTo(m2.getDateTime())).distinct()
                 .collect(Collectors.toList());
     }

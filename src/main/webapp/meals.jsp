@@ -49,6 +49,15 @@
             </tr>
         </c:forEach>
     </table>
+    <form action="${pageContext.request.contextPath}/meals">
+        <input type="hidden" name="filter" value="filter"><br>
+        Start date: <input type="date" value="${sessionScope.dateStart}" name="dateStart">
+        End date: <input type="date" value="${sessionScope.dateEnd}" name="dateEnd"><br><br>
+        Start time: <input type="time" value="${sessionScope.timeStart}" name="timeStart">
+        End time: <input type="time" value="${sessionScope.timeEnd}" name="timeEnd">
+        <p><input type="submit" value="Filter"></p>
+    </form>
 </section>
 </body>
 </html>
+
