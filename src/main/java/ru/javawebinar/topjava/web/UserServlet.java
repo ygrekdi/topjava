@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -18,7 +19,10 @@ public class UserServlet extends HttpServlet {
         String userId = request.getParameter("userId");
         if (userId != null) {
             log.debug("set userId and redirect to meals");
-            request.getSession(false).invalidate();
+            HttpSession session = request.getSession(false);
+            if(session != null){
+                session.invalidate();
+            }
             SecurityUtil.setAuthUserId(Integer.parseInt(userId));
             response.sendRedirect("meals");
         } else {

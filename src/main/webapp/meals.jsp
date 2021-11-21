@@ -21,7 +21,19 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
-    <a href="meals?action=create">Add Meal</a>
+    <td>
+        <form action="meals" method="get">
+            <input type="hidden" name="action" value="create">
+            <c:if test="${param.filter=='filter'}">
+                <input type="hidden" name="filter" value="${param.filter}">
+                <input type="hidden" name="dateStart" value="${param.dateStart}">
+                <input type="hidden" name="dateEnd" value="${param.dateEnd}">
+                <input type="hidden" name="timeStart" value="${param.timeStart}">
+                <input type="hidden" name="timeEnd" value="${param.timeEnd}">
+            </c:if>
+            <p><input type="submit" value="Add Meal"></p>
+        </form>
+    </td>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -44,17 +56,43 @@
                 </td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><a href="meals?action=update&id=${meal.id}">Update</a></td>
-                <td><a href="meals?action=delete&id=${meal.id}">Delete</a></td>
+                <td>
+                    <form action="meals" method="get">
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="id" value="${meal.id}">
+                        <c:if test="${param.filter=='filter'}">
+                            <input type="hidden" name="filter" value="${param.filter}">
+                            <input type="hidden" name="dateStart" value="${param.dateStart}">
+                            <input type="hidden" name="dateEnd" value="${param.dateEnd}">
+                            <input type="hidden" name="timeStart" value="${param.timeStart}">
+                            <input type="hidden" name="timeEnd" value="${param.timeEnd}">
+                        </c:if>
+                        <p><input type="submit" value="Update"></p>
+                    </form>
+                </td>
+                <td>
+                    <form action="meals" method="get">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="id" value="${meal.id}">
+                        <c:if test="${param.filter=='filter'}">
+                            <input type="hidden" name="filter" value="${param.filter}">
+                            <input type="hidden" name="dateStart" value="${param.dateStart}">
+                            <input type="hidden" name="dateEnd" value="${param.dateEnd}">
+                            <input type="hidden" name="timeStart" value="${param.timeStart}">
+                            <input type="hidden" name="timeEnd" value="${param.timeEnd}">
+                        </c:if>
+                        <p><input type="submit" value="Delete"></p>
+                    </form>
+                </td>
             </tr>
         </c:forEach>
     </table>
     <form action="${pageContext.request.contextPath}/meals">
         <input type="hidden" name="filter" value="filter"><br>
-        Start date: <input type="date" value="${sessionScope.dateStart}" name="dateStart">
-        End date: <input type="date" value="${sessionScope.dateEnd}" name="dateEnd"><br><br>
-        Start time: <input type="time" value="${sessionScope.timeStart}" name="timeStart">
-        End time: <input type="time" value="${sessionScope.timeEnd}" name="timeEnd">
+        Start date: <input type="date" value="${param.dateStart}" name="dateStart">
+        End date: <input type="date" value="${param.dateEnd}" name="dateEnd"><br><br>
+        Start time: <input type="time" value="${param.timeStart}" name="timeStart">
+        End time: <input type="time" value="${param.timeEnd}" name="timeEnd">
         <p><input type="submit" value="Filter"></p>
     </form>
 </section>

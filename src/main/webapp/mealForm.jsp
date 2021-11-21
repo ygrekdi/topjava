@@ -31,6 +31,13 @@
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
     <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
+        <c:if test="${param.filter=='filter'}">
+            <input type="hidden" name="filter" value="${param.filter}">
+            <input type="hidden" name="dateStart" value="${param.dateStart}">
+            <input type="hidden" name="dateEnd" value="${param.dateEnd}">
+            <input type="hidden" name="timeStart" value="${param.timeStart}">
+            <input type="hidden" name="timeEnd" value="${param.timeEnd}">
+        </c:if>
         <dl>
             <dt>DateTime:</dt>
             <dd><input type="datetime-local" value="${meal.dateTime}" name="dateTime" required></dd>
