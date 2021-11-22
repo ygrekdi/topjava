@@ -43,8 +43,7 @@ public class MealServlet extends HttpServlet {
         } else {
             mealRestController.update(meal);
         }
-        request.getSession().setAttribute("action", "all");
-        doGet(request, response);
+        response.sendRedirect("meals");
     }
 
     @Override
@@ -55,7 +54,7 @@ public class MealServlet extends HttpServlet {
                 int id = getId(request);
                 log.info("Delete {}", id);
                 mealRestController.delete(id);
-                request.getRequestDispatcher("meals?action=all").forward(request, response);
+                response.sendRedirect("meals");
                 break;
             case "create":
             case "update":

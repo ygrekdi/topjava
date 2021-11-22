@@ -28,17 +28,25 @@ public class InMemoryMealRepository implements MealRepository {
         if (meal.isNew()) {
             meal.setUserId(authUserId);
             meal.setId(counter.incrementAndGet());
-            putInRepo(repository, meal, authUserId);
+            putInRepo(meal, authUserId);
             return meal;
         }
-        Meal inRepoMeal = get(meal.getId(), authUserId);
+        Map<Integer, Meal> mealMap = repository.computeIfAbsent(authUserId, v -> new ConcurrentHashMap<>());
+        Meal inRepoMeal = mealMap.get(meal.getId());
         if (inRepoMeal != null && inRepoMeal.getUserId() != authUserId) {
             return null;
         }
-        // handle case: update, but not present in storage
         meal.setUserId(authUserId);
-        putInRepo(repository, meal, authUserId);
+        mealMap.put(meal.getId(), meal);
         return meal;
+/*        Meal inRepoMeal = get(meal.getId(), authUserId);
+        if (inRepoMeal != null && inRepoMeal.getUserId() != authUserId) {
+            return null;
+        }
+        meal.setUserId(authUserId);
+        // handle case: update, but not present in storage
+        putInRepo(meal, authUserId);
+        return meal;*/
     }
 
     @Override
@@ -51,7 +59,7 @@ public class InMemoryMealRepository implements MealRepository {
         if (meal == null || meal.getUserId() != authUserId) {
             return false;
         }
-        return repository.get(authUserId).remove(id) != null;
+        return mealMap.remove(id) != null;
     }
 
     @Override
@@ -84,13 +92,7 @@ public class InMemoryMealRepository implements MealRepository {
                 .collect(Collectors.toList()));
     }
 
-    private void putInRepo(Map<Integer, Map<Integer, Meal>> repository, Meal meal, Integer authUserId) {
-        if (repository.get(authUserId) == null) {
-            repository.put(authUserId, new ConcurrentHashMap<Integer, Meal>() {{
-                put(meal.getId(), meal);
-            }});
-        } else {
-            repository.get(authUserId).put(meal.getId(), meal);
-        }
+    private void putInRepo(Meal meal, Integer authUserId) {
+        repository.computeIfAbsent(authUserId, v -> new ConcurrentHashMap<>()).put(meal.getId(), meal);
     }
 }
