@@ -25,54 +25,30 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int authUserId) {
-        if (meal.isNew()) {
-            meal.setUserId(authUserId);
-            meal.setId(counter.incrementAndGet());
-            putInRepo(meal, authUserId);
-            return meal;
-        }
         Map<Integer, Meal> mealMap = repository.computeIfAbsent(authUserId, v -> new ConcurrentHashMap<>());
-        Meal inRepoMeal = mealMap.get(meal.getId());
-        if (inRepoMeal != null && inRepoMeal.getUserId() != authUserId) {
-            return null;
+        if (meal.isNew()) {
+            meal.setId(counter.incrementAndGet());
         }
-        meal.setUserId(authUserId);
+        else{
+            Meal inRepoMeal = mealMap.get(meal.getId());
+            if (inRepoMeal == null) {
+                return null;
+            }
+        }
         mealMap.put(meal.getId(), meal);
         return meal;
-/*        Meal inRepoMeal = get(meal.getId(), authUserId);
-        if (inRepoMeal != null && inRepoMeal.getUserId() != authUserId) {
-            return null;
-        }
-        meal.setUserId(authUserId);
-        // handle case: update, but not present in storage
-        putInRepo(meal, authUserId);
-        return meal;*/
     }
 
     @Override
     public boolean delete(int id, int authUserId) {
         Map<Integer, Meal> mealMap = repository.get(authUserId);
-        if (mealMap == null) {
-            return false;
-        }
-        Meal meal = mealMap.get(id);
-        if (meal == null || meal.getUserId() != authUserId) {
-            return false;
-        }
-        return mealMap.remove(id) != null;
+        return mealMap != null && mealMap.get(id) != null && mealMap.remove(id) != null;
     }
 
     @Override
     public Meal get(int id, int authUserId) {
         Map<Integer, Meal> mealMap = repository.get(authUserId);
-        if (mealMap == null) {
-            return null;
-        }
-        Meal meal = mealMap.get(id);
-        if (meal == null || meal.getUserId() != authUserId) {
-            return null;
-        }
-        return meal;
+        return mealMap == null ? null : mealMap.get(id);
     }
 
     @Override
@@ -90,9 +66,5 @@ public class InMemoryMealRepository implements MealRepository {
                 .filter(filter)
                 .sorted((m1, m2) -> -m1.getDateTime().compareTo(m2.getDateTime())).distinct()
                 .collect(Collectors.toList()));
-    }
-
-    private void putInRepo(Meal meal, Integer authUserId) {
-        repository.computeIfAbsent(authUserId, v -> new ConcurrentHashMap<>()).put(meal.getId(), meal);
     }
 }
