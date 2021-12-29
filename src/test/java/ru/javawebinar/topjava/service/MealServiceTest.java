@@ -1,7 +1,13 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,6 +21,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -30,8 +38,18 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Transactional
 public class MealServiceTest {
 
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+
+    @Rule
+    public Stopwatch stopwatch = new InternalStopwatch();
+
     @Autowired
     private MealService service;
+
+    @AfterClass
+    public static void summary() {
+        InternalStopwatch.testsExecutionTime.forEach((k, v) -> log.info(k + " - " + v));
+    }
 
     @Test
     public void delete() {
@@ -110,5 +128,16 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
+    }
+
+    private static class InternalStopwatch extends Stopwatch {
+        private static final Map<String, Long> testsExecutionTime = new HashMap<>();
+
+        @Override
+        protected void finished(long nanos, Description description) {
+            String testName = description.getMethodName();
+            log.info(String.format("Test %s finished, spent %d nanoseconds", testName, nanos));
+            testsExecutionTime.put(testName, nanos);
+        }
     }
 }
