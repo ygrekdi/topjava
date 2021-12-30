@@ -14,15 +14,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import javax.persistence.NoResultException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -35,7 +32,6 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@Transactional
 public class MealServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
@@ -48,13 +44,13 @@ public class MealServiceTest {
 
     @AfterClass
     public static void summary() {
-        InternalStopwatch.testsExecutionTime.forEach((k, v) -> log.info(k + " - " + v));
+        log.info(InternalStopwatch.summary);
     }
 
     @Test
     public void delete() {
         service.delete(MEAL1_ID, USER_ID);
-        assertThrows(NoResultException.class, () -> service.get(MEAL1_ID, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, USER_ID));
     }
 
     @Test
@@ -91,12 +87,12 @@ public class MealServiceTest {
 
     @Test
     public void getNotFound() {
-        assertThrows(NoResultException.class, () -> service.get(NOT_FOUND, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND, USER_ID));
     }
 
     @Test
     public void getNotOwn() {
-        assertThrows(NoResultException.class, () -> service.get(MEAL1_ID, ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
@@ -131,13 +127,14 @@ public class MealServiceTest {
     }
 
     private static class InternalStopwatch extends Stopwatch {
-        private static final Map<String, Long> testsExecutionTime = new HashMap<>();
+        private static String summary = "tests time spent in microseconds";
 
         @Override
         protected void finished(long nanos, Description description) {
             String testName = description.getMethodName();
-            log.info(String.format("Test %s finished, spent %d nanoseconds", testName, nanos));
-            testsExecutionTime.put(testName, nanos);
+            long micros = TimeUnit.NANOSECONDS.toMicros(nanos);
+            log.info(String.format("Test %s finished, spent %d microseconds", testName, micros));
+            summary += "\n" + testName + " - " + micros;
         }
     }
 }
