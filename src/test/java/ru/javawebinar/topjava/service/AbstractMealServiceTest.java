@@ -1,18 +1,15 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
-import org.springframework.test.context.ActiveProfiles;
-import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.NOT_FOUND;
@@ -21,13 +18,14 @@ import static ru.javawebinar.topjava.MealTestData.getUpdated;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ActiveProfiles(Profiles.JDBC)
-public class MealServiceTest extends AbstractServiceTest {
+public abstract class AbstractMealServiceTest extends AbstractServiceTest {
+    @Autowired
+    MealService service;
 
-    @Autowired
-    Environment environment;
-    @Autowired
-    private MealService service;
+    @BeforeClass
+    public static void clearResult(){
+        AbstractServiceTest.clearResult();
+    }
 
     @Test
     public void delete() {
@@ -108,16 +106,5 @@ public class MealServiceTest extends AbstractServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
-    }
-
-    @Test
-    public void getWithUser() {
-        if (!List.of(environment.getActiveProfiles()).contains(Profiles.DATAJPA)) {
-            assertThrows(UnsupportedOperationException.class, () -> service.getWithUser(MEAL1_ID, USER_ID));
-        } else {
-            Meal meal = service.getWithUser(MEAL1_ID, USER_ID);
-            MEAL_MATCHER.assertMatch(meal, meal1);
-            USER_MATCHER.assertMatch(meal.getUser(), user);
-        }
     }
 }

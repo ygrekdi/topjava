@@ -1,14 +1,11 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
-import org.springframework.test.context.ActiveProfiles;
-import ru.javawebinar.topjava.MealTestData;
-import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -17,17 +14,11 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
-import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ActiveProfiles(Profiles.JDBC)
-public class UserServiceTest extends AbstractServiceTest {
-
+public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
-    Environment environment;
-
-    @Autowired
-    private UserService service;
+    UserService service;
 
     @Autowired
     private CacheManager cacheManager;
@@ -35,6 +26,11 @@ public class UserServiceTest extends AbstractServiceTest {
     @Before
     public void setup() {
         cacheManager.getCache("users").clear();
+    }
+
+    @BeforeClass
+    public static void clearResult(){
+        AbstractServiceTest.clearResult();
     }
 
     @Test
@@ -92,17 +88,5 @@ public class UserServiceTest extends AbstractServiceTest {
     public void getAll() {
         List<User> all = service.getAll();
         USER_MATCHER.assertMatch(all, admin, user);
-    }
-
-    @Test
-    public void getWithMeals() {
-        if (!List.of(environment.getActiveProfiles()).contains(Profiles.DATAJPA)) {
-            assertThrows(UnsupportedOperationException.class, () -> service.getWithMeals(ADMIN_ID));
-        } else {
-            User user = service.getWithMeals(ADMIN_ID);
-            admin.setMeals(List.of(MealTestData.adminMeal1, MealTestData.adminMeal2));
-            USER_MATCHER.assertMatch(user, admin);
-            MEAL_MATCHER.assertMatch(user.getMeals(), admin.getMeals());
-        }
     }
 }

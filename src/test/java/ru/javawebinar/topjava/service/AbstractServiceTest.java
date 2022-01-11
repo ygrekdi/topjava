@@ -40,6 +40,11 @@ public abstract class AbstractServiceTest {
         }
     };
 
+
+    public static void clearResult(){
+        results.setLength(0);
+    }
+
     @AfterClass
     public static void printResult() {
         log.info("\n---------------------------------" +

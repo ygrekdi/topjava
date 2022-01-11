@@ -28,7 +28,7 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init() {
         springContext = new GenericXmlApplicationContext();
-        springContext.getEnvironment().setActiveProfiles(Profiles.JDBC, Profiles.getActiveDbProfile());
+        springContext.getEnvironment().setActiveProfiles(Profiles.getActiveDbProfile(), Profiles.REPOSITORY_IMPLEMENTATION);
         springContext.load("spring/spring-app.xml", "spring/spring-db.xml");
         springContext.refresh();
         mealController = springContext.getBean(MealRestController.class);
