@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -18,7 +17,7 @@ import static ru.javawebinar.topjava.UserTestData.*;
 
 public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
-    UserService service;
+    protected UserService service;
 
     @Autowired
     private CacheManager cacheManager;
@@ -26,11 +25,6 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Before
     public void setup() {
         cacheManager.getCache("users").clear();
-    }
-
-    @BeforeClass
-    public static void clearResult(){
-        AbstractServiceTest.clearResult();
     }
 
     @Test
