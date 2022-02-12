@@ -1,11 +1,10 @@
-package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web.meal;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.web.meal.AbstractMealController;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -24,45 +23,37 @@ public class JspMealController extends AbstractMealController {
         return "meals";
     }
 
-    @GetMapping("/create")
-    public String create(Model model){
-        final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-        model.addAttribute("meal", meal);
-        return "mealForm";
-    }
-
     @GetMapping("/delete/{mealId}")
     String delete(@PathVariable(value="mealId") Integer id){
         super.delete(id);
         return "redirect:/meals";
     }
 
-    @GetMapping("/update/{mealId}")
-    String update(@PathVariable(value="mealId") Integer id, Model model){
-        Meal meal = super.get(id);
+    @GetMapping(value = { "/createorupdate", "/createorupdate/{id}" })
+    String createorupdate(@PathVariable(required = false) Integer id, Model model){
+        Meal meal;
+        if (id != null) {
+            meal = super.get(id);
+        } else {
+             meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
+        }
         model.addAttribute("meal", meal);
         return "mealForm";
     }
 
-    @PostMapping("/update/{mealId}")
-    String update(@PathVariable(value="mealId") Integer id,
+    @PostMapping(value = { "/createorupdate", "/createorupdate/{id}" })
+    String update(@PathVariable(required = false) Integer id,
                   @RequestParam(value="calories") Integer calories,
                   @RequestParam(value="description") String description,
                   @RequestParam(value="dateTime") String dateTime){
         Meal meal = new Meal(LocalDateTime.parse(dateTime), description, calories);
-        super.update(meal, id);
+        if (id != null) {
+            super.update(meal, id);
+        } else {
+            super.create(meal);
+        }
         return "redirect:/meals";
     }
-
-    @PostMapping("/create")
-    String create(@RequestParam(value="calories") Integer calories,
-                  @RequestParam(value="description") String description,
-                  @RequestParam(value="dateTime") String dateTime){
-        Meal meal = new Meal(LocalDateTime.parse(dateTime), description, calories);
-        super.create(meal);
-        return "redirect:/meals";
-    }
-
 
     @GetMapping("/filter")
     String filter(@RequestParam(value="startTime") String startTime,

@@ -60,10 +60,8 @@ public class JdbcUserRepository implements UserRepository {
                     """, parameterSource) == 0) {
                 return null;
             }
-            List<Role> oldRole = getUserRoles(user);
-            Map<String, Role> rolesForChange = getRolesForChange(oldRole, user.getRoles().stream().toList());
-            batchInsert(List.of(rolesForChange.get("add")), user);
-            deleteRole(rolesForChange.get("delete"), user);
+            jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=? ", user.getId());
+            batchInsert(user.getRoles().stream().toList(), user);
         }
         return user;
     }
@@ -104,27 +102,6 @@ public class JdbcUserRepository implements UserRepository {
             users.forEach(u -> u.setRoles(allRoles.get(u.getId())));
         }
         return users;
-    }
-
-    private void deleteRole(Role role, User user) {
-        if (user != null && role != null) {
-            jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=? and role=?", user.getId(), role.toString());
-        }
-    }
-
-    private Map<String, Role> getRolesForChange(List<Role> oldRoles, List<Role> newRoles) {
-        Map<String, Role> result = new HashMap<>();
-        newRoles.forEach(role -> {
-            if (!oldRoles.contains(role)) {
-                result.put("add", role);
-            }
-        });
-        oldRoles.forEach(role -> {
-            if (!newRoles.contains(role)) {
-                result.put("delete", role);
-            }
-        });
-        return result;
     }
 
     private User setRoles(User user) {
